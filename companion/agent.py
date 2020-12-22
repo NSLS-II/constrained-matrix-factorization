@@ -70,6 +70,8 @@ class DirectoryAgent:
 
         if file_ordering is None:
             self.file_ordering = lambda x: x
+        else:
+            self.file_ordering = file_ordering
 
     def __len__(self):
         return len(self.paths)
@@ -102,17 +104,19 @@ class DirectoryAgent:
             n_components=self.n_components,
             normalize=True,
             initial_components=self.initial_components,
-            fix_components=(True for _ in len(self.initial_components)),
+            fix_components=[True for _ in range(len(self.initial_components))],
             **self.decomposition_args
 
         )
 
+        self.fig.clf()
         axes = self.fig.subplots(1, self.n_components + 2)
         example_plot(sub_X, sub_Y, alphas, axes=axes[:-1], sax=axes[-2],
                      components=components, comax=axes[-1],
                      alt_ordinate=np.array(idxs), summary_fig=True)
 
         # TODO: Elegantly understand if I'm in a GUI or in ipython inline
+        self.fig.patch.set_facecolor('white')
         self.fig.canvas.draw_idle()
         self.fig.canvas.flush_events()
         display.clear_output(wait=True)
@@ -142,7 +146,7 @@ class DirectoryAgent:
         start_time = time()
 
         while True:
-            if len(self.path_list()) > len(self):
+            if len(self.path_list()) != len(self):
                 self.fig.clf()
                 for path in self.path_list():
                     if path.name not in self.paths:
@@ -150,7 +154,7 @@ class DirectoryAgent:
                         xs, ys = self.load_files([path])
                         self.Xs.extend(xs)
                         self.Ys.extend(ys)
-                _, self.initial_components = self.load_files(list(self.component_dir.glob(self.path_spec)))
+            _, self.initial_components = self.load_files(list(self.component_dir.glob(self.path_spec)))
             self.update_plot()
             if timeout and time() - start_time > timeout:
                 break

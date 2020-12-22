@@ -14,7 +14,7 @@ def decomposition(Q,
                   fix_components=(),
                   mode="Linear",
                   kernel_width=1,
-                  max_iter=10000,
+                  max_iter=1000,
                   bkg_removal=None,
                   normalize=False,
                   **kwargs):
@@ -92,7 +92,7 @@ def decomposition(Q,
         bases = np.stack(bases)
         sub_I = sub_I - bases
     if normalize:
-        sub_I = (sub_I - np.min(I, axis=1, keepdims=True)) / (
+        sub_I = (sub_I - np.min(sub_I, axis=1, keepdims=True)) / (
                 np.max(sub_I, axis=1, keepdims=True) - np.min(sub_I, axis=1, keepdims=True))
 
     # Numerical stability of non-negativity
@@ -100,6 +100,8 @@ def decomposition(Q,
         sub_I = sub_I - np.min(sub_I, axis=1, keepdims=True)
 
     # Initial components
+    if mode != "Deconvolutional":
+        kernel_width = 1
     n_features = sub_I.shape[1]
     if initial_components is None:
         input_H = None
@@ -107,10 +109,13 @@ def decomposition(Q,
         input_H = []
         for i in range(n_components):
             try:
-                input_H.append(torch.tensor(initial_components[i][idx_min:idx_max],
-                                            dtype=torch.float).reshape(1, n_features))
+                sub_H = initial_components[i][idx_min:idx_max]
+                sub_H = sub_H[kernel_width // 2:-kernel_width // 2 + 1]
+                if normalize:
+                    sub_H = (sub_H - np.min(sub_H)) / (np.max(sub_H) - np.min(sub_H))
+                input_H.append(torch.tensor(sub_H, dtype=torch.float).reshape(1, n_features-kernel_width+1))
             except IndexError:
-                input_H.append(torch.rand(1, n_features))
+                input_H.append(torch.rand(1, n_features-kernel_width+1))
 
     # Model construction
     if mode == "Linear":
@@ -121,7 +126,7 @@ def decomposition(Q,
     else:
         raise NotImplementedError
 
-    _, W = model.fit_transform(max_iter=max_iter, **kwargs)
+    _, W = model.fit_transform(torch.Tensor(sub_I), max_iter=max_iter, **kwargs)
 
     if len(W.shape) > 2:
         alphas = torch.mean(W, 2).data.numpy()
@@ -212,6 +217,7 @@ def example_plot(sub_Q, sub_I, alphas, axes=None, sax=None, components=None, com
         if comax is None:
             comfig, comax = plt.subplots(figsize=(6, 6))
         for i in range(components.shape[0]):
-            comax.plot(xs[0, :], components[i, :]+i, color=cmap(norm(i)))
+            kernel_width = xs.shape[1] - components.shape[1] + 1
+            comax.plot(xs[0][kernel_width // 2:-kernel_width // 2 + 1], components[i, :] + i, color=cmap(norm(i)))
 
     return
