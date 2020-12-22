@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 from companion.nmf import decomposition, example_plot
 from IPython import display
 
-
+#TODO: intial component dir
 class DirectoryAgent:
 
-    def __init__(self, data_dir, n_components, *, data_spec=None, x_lim=None, output_dir=None, header=0,
-                 file_ordering=None, file_limit=None, figsize=None, **kwargs):
+    def __init__(self, data_dir, n_components, *, data_spec=None, x_lim=None, component_dir=None, output_dir=None,
+                 header=0, file_ordering=None, file_limit=None, figsize=None, **kwargs):
         """
         Class for building trained model and classifying a directory.
         Classification can be accomplished on the fly or once using the spin() method.
@@ -26,6 +26,8 @@ class DirectoryAgent:
             final file spec such as '*.xy'.
         x_lim:  tuple
             Size two tuple for bounding the Xs to a region of interest
+        component_dir: pathlike
+            Directory containing initial components.
         header: int
             Number of header lines in file
         training_output_dir: pathlike
@@ -43,6 +45,7 @@ class DirectoryAgent:
         """
 
         self.dir = Path(data_dir).expanduser()
+        self.component_dir = Path(component_dir).expanduser()
         self.n_components = n_components
         if data_spec is None:
             self.path_spec = '*'
@@ -52,6 +55,7 @@ class DirectoryAgent:
         self.paths = []
         self.Ys = []
         self.Xs = []
+        self.initial_components = []
         self.limit = file_limit
         self.x_lim = x_lim
         self.header = header
@@ -73,7 +77,7 @@ class DirectoryAgent:
     def path_list(self):
         return list(self.dir.glob(self.path_spec))
 
-    def load_file(self, paths):
+    def load_files(self, paths):
         xs = []
         ys = []
         paths = sorted(paths)
@@ -97,6 +101,8 @@ class DirectoryAgent:
             q_range=self.x_lim,
             n_components=self.n_components,
             normalize=True,
+            initial_components=self.initial_components,
+            fix_components=(True for _ in len(self.initial_components)),
             **self.decomposition_args
 
         )
@@ -141,9 +147,10 @@ class DirectoryAgent:
                 for path in self.path_list():
                     if path.name not in self.paths:
                         self.paths.append(path.name)
-                        xs, ys = self.load_file([path])
+                        xs, ys = self.load_files([path])
                         self.Xs.extend(xs)
                         self.Ys.extend(ys)
+                _, self.initial_components = self.load_files(list(self.component_dir.glob(self.path_spec)))
             self.update_plot()
             if timeout and time() - start_time > timeout:
                 break
