@@ -9,7 +9,7 @@ def KL_divergence(predict, target):
 
 
 def Euclidean(predict, target):
-    return F.mse_loss(predict, target, reduction='sum') / 2
+    return F.mse_loss(predict, target, reduction="sum") / 2
 
 
 def IS_divergence(predict, target):
@@ -26,5 +26,8 @@ def Beta_divergence(predict, target, beta=2):
         return IS_divergence(predict, target)
     else:
         bminus = beta - 1
-        return (target.pow(beta).sum() + bminus * predict.pow(beta).sum() - beta * (
-                target * predict.pow(bminus)).sum()) / (beta * bminus)
+        return (
+            target.pow(beta).sum()
+            + bminus * predict.pow(beta).sum()
+            - beta * (target * predict.pow(bminus)).sum()
+        ) / (beta * bminus)
