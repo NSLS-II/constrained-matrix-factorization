@@ -269,33 +269,3 @@ class NMFD(NMFBase):
 
     def sort(self):
         raise NotImplementedError
-
-
-if __name__ == "__main__":
-    from nmf.models import NMF
-    import numpy as np
-    import torch
-
-
-    def gaussian(x, mu, sig):
-        return np.exp(-np.power(x - mu, 2.0) / (2 * np.power(sig, 2.0)))
-
-
-    n_features = 1000
-    m_patterns = 10
-    x = np.linspace(-10, 10, n_features)
-    y1 = gaussian(x, 0, 1) + np.random.normal(0, 0.01, (m_patterns, n_features))
-    y2 = gaussian(x, -5, 1) + np.random.normal(0, 0.01, (m_patterns, n_features))
-    y3 = gaussian(x, 5, 1) + np.random.normal(0, 0.01, (m_patterns, n_features))
-    Y = np.concatenate((y1, y2, y3), axis=0)
-    fixin = gaussian(x, 0.1, 1)
-    input_H = (
-        torch.tensor(fixin, dtype=torch.float).reshape(1, n_features),
-        torch.rand(1, n_features),
-        torch.rand(1, n_features),
-    )
-    model = NMFD(
-        Y.shape, 3, initial_components=input_H, T=1, fix_components=(True, False, False)
-    )
-    # model = NMFD(Y.shape,3, T=5)
-    n_iter = model.fit(torch.tensor(Y), beta=2, alpha=0.5)
