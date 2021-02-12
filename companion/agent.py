@@ -5,11 +5,23 @@ import matplotlib.pyplot as plt
 from companion.nmf import decomposition, example_plot
 from IPython import display
 
-#TODO: intial component dir
+# TODO: intial component dir
 class DirectoryAgent:
-
-    def __init__(self, data_dir, n_components, *, data_spec=None, x_lim=None, component_dir=None, output_dir=None,
-                 header=0, file_ordering=None, file_limit=None, figsize=None, **kwargs):
+    def __init__(
+        self,
+        data_dir,
+        n_components,
+        *,
+        data_spec=None,
+        x_lim=None,
+        component_dir=None,
+        output_dir=None,
+        header=0,
+        file_ordering=None,
+        file_limit=None,
+        figsize=None,
+        **kwargs
+    ):
         """
         Class for building trained model and classifying a directory.
         Classification can be accomplished on the fly or once using the spin() method.
@@ -48,7 +60,7 @@ class DirectoryAgent:
         self.component_dir = Path(component_dir).expanduser()
         self.n_components = n_components
         if data_spec is None:
-            self.path_spec = '*'
+            self.path_spec = "*"
         else:
             self.path_spec = data_spec
         self.output_dir = output_dir
@@ -86,7 +98,7 @@ class DirectoryAgent:
         for idx, path in enumerate(paths):
             if not (self.limit is None) and idx >= self.limit:
                 break
-            _x, _y = np.loadtxt(path, comments='#', skiprows=self.header).T
+            _x, _y = np.loadtxt(path, comments="#", skiprows=self.header).T
             xs.append(_x)
             ys.append(_y)
         return xs, ys
@@ -94,7 +106,12 @@ class DirectoryAgent:
     def update_plot(self):
         if len(self) < 2:
             return
-        idxs = [x for x, y in sorted(enumerate(self.paths), key=lambda x: self.file_ordering(x[1]))]
+        idxs = [
+            x
+            for x, y in sorted(
+                enumerate(self.paths), key=lambda x: self.file_ordering(x[1])
+            )
+        ]
         Xs = np.array(self.Xs)
         Ys = np.array(self.Ys)
         sub_X, sub_Y, alphas, components = decomposition(
@@ -106,17 +123,24 @@ class DirectoryAgent:
             initial_components=self.initial_components,
             fix_components=[True for _ in range(len(self.initial_components))],
             **self.decomposition_args
-
         )
 
         self.fig.clf()
         axes = self.fig.subplots(1, self.n_components + 2)
-        example_plot(sub_X, sub_Y, alphas, axes=axes[:-1], sax=axes[-2],
-                     components=components, comax=axes[-1],
-                     alt_ordinate=np.array(idxs), summary_fig=True)
+        example_plot(
+            sub_X,
+            sub_Y,
+            alphas,
+            axes=axes[:-1],
+            sax=axes[-2],
+            components=components,
+            comax=axes[-1],
+            alt_ordinate=np.array(idxs),
+            summary_fig=True,
+        )
 
         # TODO: Elegantly understand if I'm in a GUI or in ipython inline
-        self.fig.patch.set_facecolor('white')
+        self.fig.patch.set_facecolor("white")
         self.fig.canvas.draw_idle()
         self.fig.canvas.flush_events()
         display.clear_output(wait=True)
@@ -154,12 +178,15 @@ class DirectoryAgent:
                         xs, ys = self.load_files([path])
                         self.Xs.extend(xs)
                         self.Ys.extend(ys)
-            _, self.initial_components = self.load_files(list(self.component_dir.glob(self.path_spec)))
+            _, self.initial_components = self.load_files(
+                list(self.component_dir.glob(self.path_spec))
+            )
             self.update_plot()
             if timeout and time() - start_time > timeout:
                 break
             sleep(sleep_delay)
         return np.array(self.Xs), np.array(self.Ys)
+
 
 # TODO: Implement RemoteDispatcher and Accumulator agents. See
 #  https://github.com/NSLS-II-XPD/ae-gpcam/blob/main/companion/agent.py
