@@ -1,4 +1,6 @@
 import torch
+import numpy as np
+import scipy.stats as st
 
 
 def normalize(x: torch.Tensor, axis=0) -> torch.Tensor:
