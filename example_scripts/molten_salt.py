@@ -28,8 +28,8 @@ def get_data(data_dir=None):
     return T, X
 
 
-def standard_nmf(X):
-    nmf = NMF(X.shape, 3)
+def standard_nmf(X, n_components=4):
+    nmf = NMF(X.shape, n_components)
     n_iter = nmf.fit(X, beta=2, tol=1e-8, max_iter=1000)
     return nmf
 
@@ -54,7 +54,7 @@ def make_plots(n_components=4):
     fig, ax = sweep_components(X, n_max=10)
     figs.append(fig),
     axes.append(ax)
-    nmf = standard_nmf(X)
+    nmf = standard_nmf(X, n_components)
     fig, ax = decomp_plot(nmf, T)
     plot_adjustments(ax)
     figs.append(fig)
@@ -73,7 +73,8 @@ def make_plots(n_components=4):
 if __name__ == "__main__":
     path = Path(__file__).parent / "example_output"
     path.mkdir(exist_ok=True)
-    figs = make_plots()
+    n = 4
+    figs = make_plots(n)
     for i, fig in enumerate(figs):
         fig.tight_layout()
         fig.show()
