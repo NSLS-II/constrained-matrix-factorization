@@ -95,6 +95,11 @@ class NMFBase(nn.Module):
     def W(self):
         return torch.cat([x for x in self.W_list])
 
+    def loss(self, X, beta=2):
+        with torch.no_grad():
+            WH = self.reconstruct(self.H, self.W)
+            return Beta_divergence(self.fix_neg(WH), X, beta)
+
     def forward(self, H=None, W=None):
         if H is None:
             H = self.H
