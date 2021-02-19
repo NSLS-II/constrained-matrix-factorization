@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from nmf.metrics import Beta_divergence
+from deepnmf.nmf.metrics import Beta_divergence
 
 
 def _mu_update(param, pos, gamma, l1_reg, l2_reg):
@@ -41,14 +41,14 @@ def _mu_update(param, pos, gamma, l1_reg, l2_reg):
 
 class NMFBase(nn.Module):
     def __init__(
-            self,
-            W_shape,
-            H_shape,
-            n_components,
-            initial_components=None,
-            fix_components=(),
-            initial_weights=None,
-            fix_weights=(),
+        self,
+        W_shape,
+        H_shape,
+        n_components,
+        initial_components=None,
+        fix_components=(),
+        initial_weights=None,
+        fix_weights=(),
     ):
         """
         Base class for setting up NMF
@@ -72,7 +72,9 @@ class NMFBase(nn.Module):
         if initial_weights is not None:
             w_list = [nn.Parameter(weight) for weight in initial_weights]
         else:
-            w_list = [nn.Parameter(torch.rand(1, *W_shape[1:])) for _ in range(W_shape[0])]
+            w_list = [
+                nn.Parameter(torch.rand(1, *W_shape[1:])) for _ in range(W_shape[0])
+            ]
         if fix_weights:
             for i in range(len(fix_weights)):
                 w_list[i].requires_grad = not fix_weights[i]
@@ -81,7 +83,9 @@ class NMFBase(nn.Module):
         if initial_components is not None:
             h_list = [nn.Parameter(component) for component in initial_components]
         else:
-            h_list = [nn.Parameter(torch.rand(1, *H_shape[1:])) for _ in range(H_shape[0])]
+            h_list = [
+                nn.Parameter(torch.rand(1, *H_shape[1:])) for _ in range(H_shape[0])
+            ]
         if fix_components:
             for i in range(len(fix_components)):
                 h_list[i].requires_grad = not fix_components[i]
@@ -117,15 +121,15 @@ class NMFBase(nn.Module):
         raise NotImplementedError
 
     def fit(
-            self,
-            X,
-            update_W=True,
-            update_H=True,
-            beta=1,
-            tol=1e-5,
-            max_iter=200,
-            alpha=0,
-            l1_ratio=0,
+        self,
+        X,
+        update_W=True,
+        update_H=True,
+        beta=1,
+        tol=1e-5,
+        max_iter=200,
+        alpha=0,
+        l1_ratio=0,
     ):
 
         X = X.type(torch.float)

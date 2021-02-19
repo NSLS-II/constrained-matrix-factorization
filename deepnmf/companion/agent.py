@@ -2,7 +2,7 @@ from pathlib import Path
 import numpy as np
 from time import sleep, time
 import matplotlib.pyplot as plt
-from companion.nmf import decomposition, example_plot
+from deepnmf.companion.nmf import decomposition, example_plot
 from IPython import display
 
 # TODO: intial component dir

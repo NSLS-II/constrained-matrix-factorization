@@ -21,7 +21,7 @@ def sweep_components(X, n_max=None, n_min=2):
     fig
     """
     import matplotlib.pyplot as plt
-    from nmf.models import NMF
+    from deepnmf.nmf.models import NMF
 
     if n_max is None:
         n_max = X.shape[0]

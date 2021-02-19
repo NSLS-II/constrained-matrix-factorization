@@ -1,5 +1,5 @@
 "Non-negative matrix factorization of full datasets"
-from nmf.models import NMF, NMFD
+from deepnmf.nmf.models import NMF, NMFD
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
