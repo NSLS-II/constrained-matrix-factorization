@@ -34,54 +34,6 @@ def standard_nmf(X):
     return nmf
 
 
-# def constrained_nmf(X):
-# TOL = 1e-8
-# MAX_ITER = 1000
-# nmfs = list()
-# n_components = 4
-# initial_components = [torch.rand(1, X.shape[-1]) for _ in range(n_components)]
-# fix_components = [False for _ in range(n_components)]
-# initial_components[0] = X[0, :].reshape(1, -1)
-# fix_components[0] = True
-# initial_components[-1] = X[-1, :].reshape(1, -1)
-# fix_components[-1] = True
-# nmf = NMF(
-#     X.shape,
-#     n_components,
-#     initial_components=initial_components,
-#     fix_components=fix_components,
-# )
-# n_iter = nmf.fit(X, beta=2, tol=TOL, max_iter=MAX_ITER)
-# nmfs.append(nmf)
-#
-# weight_idx = nmf.W.max(axis=0).values[1:-1].argmax() + 1
-# pattern_idx = int(nmf.W.argmax(axis=0)[weight_idx])
-# initial_components[weight_idx] = X[pattern_idx, :].reshape(1, -1)
-# fix_components[weight_idx] = True
-# nmf = NMF(
-#     X.shape,
-#     n_components,
-#     initial_components=initial_components,
-#     fix_components=fix_components,
-# )
-# n_iter = nmf.fit(X, beta=2, tol=TOL, max_iter=MAX_ITER)
-# nmfs.append(nmf)
-#
-# weight_idx = 1
-# pattern_idx = int(nmf.W.argmax(axis=0)[weight_idx])
-# initial_components[weight_idx] = X[pattern_idx, :].reshape(1, -1)
-# fix_components[weight_idx] = True
-# nmf = NMF(
-#     X.shape,
-#     n_components,
-#     initial_components=initial_components,
-#     fix_components=fix_components,
-# )
-# n_iter = nmf.fit(X, beta=2, tol=0, max_iter=MAX_ITER * 5)
-# nmfs.append(nmf)
-# return nmfs
-
-
 def plot_adjustments(axes):
     for ax in axes[1:]:
         ax.set_xlabel("Temperature [K]")
