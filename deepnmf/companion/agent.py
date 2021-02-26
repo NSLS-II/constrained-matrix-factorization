@@ -2,8 +2,9 @@ from pathlib import Path
 import numpy as np
 from time import sleep, time
 import matplotlib.pyplot as plt
-from deepnmf.companion.nmf import decomposition, example_plot
+from deepnmf.companion.nmf import decomposition, iterative_decomposition, example_plot
 from IPython import display
+
 
 # TODO: intial component dir
 class DirectoryAgent:
@@ -103,6 +104,9 @@ class DirectoryAgent:
             ys.append(_y)
         return xs, ys
 
+    def _decomposition(self, *args, **kwargs):
+        return decomposition(*args, **kwargs)
+
     def update_plot(self):
         if len(self) < 2:
             return
@@ -114,7 +118,7 @@ class DirectoryAgent:
         ]
         Xs = np.array(self.Xs)
         Ys = np.array(self.Ys)
-        sub_X, sub_Y, alphas, components = decomposition(
+        sub_X, sub_Y, alphas, components = self._decomposition(
             Xs,
             Ys,
             q_range=self.x_lim,
@@ -186,6 +190,38 @@ class DirectoryAgent:
                 break
             sleep(sleep_delay)
         return np.array(self.Xs), np.array(self.Ys)
+
+
+class AutoDirectoryAgent(DirectoryAgent):
+    def __init__(
+        self,
+        data_dir,
+        n_components,
+        *,
+        data_spec=None,
+        x_lim=None,
+        output_dir=None,
+        header=0,
+        file_ordering=None,
+        file_limit=None,
+        figsize=None,
+        **kwargs
+    ):
+        super().__init__(
+            data_dir,
+            n_components,
+            data_spec=data_spec,
+            x_lim=x_lim,
+            output_dir=output_dir,
+            header=header,
+            file_ordering=file_ordering,
+            file_limit=file_limit,
+            figsize=figsize,
+            **kwargs
+        )
+
+    def _decomposition(self, *args, **kwargs):
+        return iterative_decomposition(*args, **kwargs)
 
 
 # TODO: Implement RemoteDispatcher and Accumulator agents. See

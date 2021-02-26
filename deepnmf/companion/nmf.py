@@ -1,5 +1,6 @@
 "Non-negative matrix factorization of full datasets"
 from deepnmf.nmf.models import NMF, NMFD
+from deepnmf.nmf.utils import iterative_nmf
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -163,6 +164,87 @@ def decomposition(
     return sub_Q, sub_I, alphas, components
 
 
+def iterative_decomposition(
+    Q,
+    I,
+    n_components=3,
+    q_range=None,
+    mode="Linear",
+    kernel_width=1,
+    max_iter=1000,
+    bkg_removal=None,
+    normalize=False,
+    **kwargs,
+):
+    # Data subselection
+    if q_range is None:
+        idx_min = 0
+        idx_max = I.shape[1]
+    else:
+        idx_min = (
+            np.where(Q[0, :] < q_range[0])[0][-1]
+            if len(np.where(Q[0, :] < q_range[0])[0])
+            else 0
+        )
+        idx_max = (
+            np.where(Q[0, :] > q_range[1])[0][0]
+            if len(np.where(Q[0, :] > q_range[1])[0])
+            else I.shape[1]
+        )
+
+    sub_I = I[:, idx_min:idx_max]
+    sub_Q = Q[:, idx_min:idx_max]
+
+    # Data manipulation
+    if bkg_removal:
+        import peakutils
+
+        bases = []
+        for i in range(sub_I.shape[0]):
+            bases.append(peakutils.baseline(sub_I[i, :], deg=bkg_removal))
+        bases = np.stack(bases)
+        sub_I = sub_I - bases
+    if normalize:
+        sub_I = (sub_I - np.min(sub_I, axis=1, keepdims=True)) / (
+            np.max(sub_I, axis=1, keepdims=True) - np.min(sub_I, axis=1, keepdims=True)
+        )
+
+    # Numerical stability of non-negativity
+    if np.min(sub_I) < 0:
+        sub_I = sub_I - np.min(sub_I, axis=1, keepdims=True)
+
+    if mode == "Deconvolutional":
+        nmf_class = NMFD
+    elif mode == "Linear":
+        nmf_class = NMF
+    else:
+        raise NotImplementedError(f"Mode {mode} unavailable.")
+
+    # Safety check
+    if "initial_components" in kwargs:
+        del kwargs["initial_components"]
+    if "fix_components" in kwargs:
+        del kwargs["fix_components"]
+
+    nmfs = iterative_nmf(
+        nmf_class,
+        torch.tensor(sub_I, dtype=torch.float),
+        n_components=n_components,
+        max_iter=max_iter,
+        **kwargs,
+    )
+
+    nmf = nmfs[-1]
+    W = nmf.W
+    H = nmf.H
+    if len(W.shape) > 2:
+        alphas = torch.mean(W, 2).data.numpy()
+    else:
+        alphas = W.data.numpy()
+    components = H.data.numpy()
+    return sub_Q, sub_I, alphas, components
+
+
 def waterfall(ax, xs, ys, alphas, color="k", sampling=1, offset=0.2, **kwargs):
     indicies = range(0, xs.shape[0])[::sampling]
     for plt_i, idx in enumerate(indicies):
@@ -265,10 +347,17 @@ def example_plot(
             comfig, comax = plt.subplots(figsize=(6, 6))
         for i in range(components.shape[0]):
             kernel_width = xs.shape[1] - components.shape[1] + 1
-            comax.plot(
-                xs[0][kernel_width // 2 : -kernel_width // 2 + 1],
-                components[i, :] + i,
-                color=cmap(norm(i)),
-            )
+            if kernel_width == 1:
+                comax.plot(
+                    xs[0][:],
+                    components[i, :] + i,
+                    color=cmap(norm(i)),
+                )
+            else:
+                comax.plot(
+                    xs[0][kernel_width // 2 : -kernel_width // 2 + 1],
+                    components[i, :] + i,
+                    color=cmap(norm(i)),
+                )
 
     return
