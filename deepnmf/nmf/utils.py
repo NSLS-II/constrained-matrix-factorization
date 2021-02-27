@@ -45,7 +45,7 @@ def sweep_components(X, n_max=None, n_min=2):
 
 
 def iterative_nmf(
-    NMFClass, X, n_components, *, beta=2, tol=1e-8, max_iter=1000, **kwargs
+    NMFClass, X, n_components, *, beta=2, alpha=0.0, tol=1e-8, max_iter=1000, **kwargs
 ):
     """
     Utility for performing NMF on a stream of data along a common state variable
@@ -90,7 +90,7 @@ def iterative_nmf(
         fix_components=fix_components,
         **kwargs
     )
-    nmf.fit(X, beta=beta, tol=tol, max_iter=max_iter)
+    nmf.fit(X, beta=beta, tol=tol, max_iter=max_iter, alpha=alpha)
     nmfs.append(nmf)
 
     if len(nmf.W.shape) == 3:
@@ -131,7 +131,7 @@ def iterative_nmf(
             fix_components=fix_components,
             **kwargs
         )
-        nmf.fit(X, beta=beta, tol=tol, max_iter=max_iter)
+        nmf.fit(X, beta=beta, tol=tol, max_iter=max_iter, alpha=alpha)
         nmfs.append(nmf)
 
     return nmfs

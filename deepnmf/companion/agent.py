@@ -58,7 +58,10 @@ class DirectoryAgent:
         """
 
         self.dir = Path(data_dir).expanduser()
-        self.component_dir = Path(component_dir).expanduser()
+        if component_dir is None:
+            self.component_dir = None
+        else:
+            self.component_dir = Path(component_dir).expanduser()
         self.n_components = n_components
         if data_spec is None:
             self.path_spec = "*"
@@ -90,7 +93,7 @@ class DirectoryAgent:
         return len(self.paths)
 
     def path_list(self):
-        return list(self.dir.glob(self.path_spec))
+        return sorted(list(self.dir.glob(self.path_spec)), key=self.file_ordering)
 
     def load_files(self, paths):
         xs = []
@@ -110,12 +113,6 @@ class DirectoryAgent:
     def update_plot(self):
         if len(self) < 2:
             return
-        idxs = [
-            x
-            for x, y in sorted(
-                enumerate(self.paths), key=lambda x: self.file_ordering(x[1])
-            )
-        ]
         Xs = np.array(self.Xs)
         Ys = np.array(self.Ys)
         sub_X, sub_Y, alphas, components = self._decomposition(
@@ -139,7 +136,6 @@ class DirectoryAgent:
             sax=axes[-2],
             components=components,
             comax=axes[-1],
-            alt_ordinate=np.array(idxs),
             summary_fig=True,
         )
 
@@ -182,9 +178,10 @@ class DirectoryAgent:
                         xs, ys = self.load_files([path])
                         self.Xs.extend(xs)
                         self.Ys.extend(ys)
-            _, self.initial_components = self.load_files(
-                list(self.component_dir.glob(self.path_spec))
-            )
+            if self.component_dir:
+                _, self.initial_components = self.load_files(
+                    list(self.component_dir.glob(self.path_spec))
+                )
             self.update_plot()
             if timeout and time() - start_time > timeout:
                 break

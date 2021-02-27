@@ -49,6 +49,7 @@ class NMFBase(nn.Module):
         fix_components=(),
         initial_weights=None,
         fix_weights=(),
+        **kwargs
     ):
         """
         Base class for setting up NMF

@@ -231,6 +231,7 @@ def iterative_decomposition(
         torch.tensor(sub_I, dtype=torch.float),
         n_components=n_components,
         max_iter=max_iter,
+        T=kernel_width,
         **kwargs,
     )
 
