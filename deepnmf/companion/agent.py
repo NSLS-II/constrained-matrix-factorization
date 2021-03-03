@@ -198,8 +198,8 @@ class DirectoryAgent:
         from deepnmf.nmf.utils import sweep_components
 
         xs, ys = self.load_files(self.path_list())
-        X = torch.tensor(xs)
-        return sweep_components(X, n_max=n_max)
+        Y = torch.tensor(ys)
+        return sweep_components(Y, n_max=n_max)
 
 
 class AutoDirectoryAgent(DirectoryAgent):
