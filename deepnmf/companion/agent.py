@@ -98,7 +98,7 @@ class DirectoryAgent:
     def load_files(self, paths):
         xs = []
         ys = []
-        paths = sorted(paths)
+        paths = sorted(paths, key=self.file_ordering)
         for idx, path in enumerate(paths):
             if not (self.limit is None) and idx >= self.limit:
                 break
@@ -192,6 +192,14 @@ class DirectoryAgent:
                 break
             sleep(sleep_delay)
         return np.array(self.Xs), np.array(self.Ys)
+
+    def elbow_plot(self, n_max):
+        import torch
+        from deepnmf.nmf.utils import sweep_components
+
+        xs, ys = self.load_files(self.path_list())
+        X = torch.tensor(xs)
+        return sweep_components(X, n_max=n_max)
 
 
 class AutoDirectoryAgent(DirectoryAgent):
