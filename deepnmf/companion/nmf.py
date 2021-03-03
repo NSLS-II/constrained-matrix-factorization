@@ -123,7 +123,7 @@ def decomposition(
         for i in range(n_components):
             try:
                 sub_H = initial_components[i][idx_min:idx_max]
-                sub_H = sub_H[kernel_width // 2 : -kernel_width // 2 + 1]
+                sub_H = sub_H[kernel_width // 2 : len(sub_H) - kernel_width // 2 + 1]
                 if normalize:
                     sub_H = (sub_H - np.min(sub_H)) / (np.max(sub_H) - np.min(sub_H))
                 input_H.append(
@@ -231,7 +231,7 @@ def iterative_decomposition(
         torch.tensor(sub_I, dtype=torch.float),
         n_components=n_components,
         max_iter=max_iter,
-        T=kernel_width,
+        kernel_width=kernel_width,
         **kwargs,
     )
 

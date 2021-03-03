@@ -21,7 +21,7 @@ class DirectoryAgent:
         file_ordering=None,
         file_limit=None,
         figsize=None,
-        **kwargs
+        **kwargs,
     ):
         """
         Class for building trained model and classifying a directory.
@@ -123,7 +123,7 @@ class DirectoryAgent:
             normalize=True,
             initial_components=self.initial_components,
             fix_components=[True for _ in range(len(self.initial_components))],
-            **self.decomposition_args
+            **self.decomposition_args,
         )
 
         self.fig.clf()
@@ -182,6 +182,11 @@ class DirectoryAgent:
                 _, self.initial_components = self.load_files(
                     list(self.component_dir.glob(self.path_spec))
                 )
+            if len(self.initial_components) > self.n_components:
+                raise RuntimeError(
+                    f"Found {len(self.initial_components)} files for initial components, "
+                    f"but the NMF is set to use only {self.n_components} components"
+                )
             self.update_plot()
             if timeout and time() - start_time > timeout:
                 break
@@ -202,7 +207,7 @@ class AutoDirectoryAgent(DirectoryAgent):
         file_ordering=None,
         file_limit=None,
         figsize=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(
             data_dir,
@@ -214,7 +219,7 @@ class AutoDirectoryAgent(DirectoryAgent):
             file_ordering=file_ordering,
             file_limit=file_limit,
             figsize=figsize,
-            **kwargs
+            **kwargs,
         )
 
     def _decomposition(self, *args, **kwargs):
