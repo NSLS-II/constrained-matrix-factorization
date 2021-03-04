@@ -97,7 +97,7 @@ def iterative_nmf(
         convolutional = True
     else:
         convolutional = False
-    visited = {0, n_components}
+    visited = {0, n_components - 1}
     for _ in range(n_components - 2):
 
         # Find next most prominent weight
