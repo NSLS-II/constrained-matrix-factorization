@@ -351,13 +351,13 @@ def example_plot(
             if kernel_width == 1:
                 comax.plot(
                     xs[0][:],
-                    components[i, :] + i,
+                    components[alpha_ord[i], :] + i,
                     color=cmap(norm(i)),
                 )
             else:
                 comax.plot(
                     xs[0][kernel_width // 2 : -kernel_width // 2 + 1],
-                    components[i, :] + i,
+                    components[alpha_ord[i], :] + i,
                     color=cmap(norm(i)),
                 )
 
