@@ -6,7 +6,6 @@ from deepnmf.companion.nmf import decomposition, iterative_decomposition, exampl
 from IPython import display
 
 
-# TODO: intial component dir
 class DirectoryAgent:
     def __init__(
         self,
@@ -77,6 +76,8 @@ class DirectoryAgent:
         self.header = header
         self.fig = plt.figure(figsize=figsize)
         self.decomposition_args = kwargs
+        self.components = None
+        self.weights = None
 
         # TODO: Elegantly understand if I'm in a GUI or in ipython inline
         try:
@@ -125,6 +126,9 @@ class DirectoryAgent:
             fix_components=[True for _ in range(len(self.initial_components))],
             **self.decomposition_args,
         )
+
+        self.components = components
+        self.weights = alphas
 
         self.fig.clf()
         axes = self.fig.subplots(1, self.n_components + 2)
@@ -194,6 +198,17 @@ class DirectoryAgent:
         return np.array(self.Xs), np.array(self.Ys)
 
     def elbow_plot(self, n_max):
+        """
+        Sweeps over all values of n_components and returns a plot of losses vs n_components
+        Parameters
+        ----------
+        n_max : int
+            Max n in search, default X.shape[0]
+
+        Returns
+        -------
+        fig, axes
+        """
         import torch
         from deepnmf.nmf.utils import sweep_components
 
