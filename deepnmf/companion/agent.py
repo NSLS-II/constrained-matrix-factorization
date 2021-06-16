@@ -2,7 +2,8 @@ from pathlib import Path
 import numpy as np
 from time import sleep, time
 import matplotlib.pyplot as plt
-from deepnmf.companion.nmf import decomposition, iterative_decomposition, example_plot
+from deepnmf.companion.nmf import decomposition, iterative_decomposition
+from deepnmf.companion.plotting import summary_plot
 from IPython import display
 
 
@@ -132,7 +133,7 @@ class DirectoryAgent:
 
         self.fig.clf()
         axes = self.fig.subplots(1, self.n_components + 2)
-        example_plot(
+        summary_plot(
             sub_X,
             sub_Y,
             alphas,
