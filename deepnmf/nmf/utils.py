@@ -91,6 +91,8 @@ def iterative_nmf(
         Number of components for NMF
     beta : int
         Beta for determining loss function
+    alpha : float
+        Alpha for determining regularization. Default 0.0 is no regularization.
     tol : float
         Optimization tolerance
     max_iter : int
