@@ -151,7 +151,7 @@ def decomposition(
     else:
         raise NotImplementedError
 
-    _, W = model.fit_transform(torch.Tensor(sub_I), max_iter=max_iter, **kwargs)
+    _, W = model.fit_transform(torch.tensor(sub_I), max_iter=max_iter, **kwargs)
 
     if len(W.shape) > 2:
         alphas = torch.mean(W, 2).data.numpy()
