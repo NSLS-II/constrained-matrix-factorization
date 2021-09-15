@@ -12,5 +12,5 @@ per-file-ignores =
     constrainedmf/companion/nmf.py:E741
 
 ignore = E203, W503
-max-line-length = 121
+max-line-length = 124
 max-complexity = 18
