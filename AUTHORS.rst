@@ -5,7 +5,7 @@ Credits
 Maintainer
 ----------
 
-* Phil Maffettone <pmaffetto@bnl.gov>
+* Phil Maffettone <pmaffettone@bnl.gov>
 
 Contributors
 ------------

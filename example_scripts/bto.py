@@ -1,9 +1,9 @@
-from deepnmf.nmf.models import NMF
+from constrainedmf.nmf.models import NMF
 import numpy as np
 import torch
 from pathlib import Path
-from deepnmf.companion.plotting import decomp_plot
-from deepnmf.nmf.utils import sweep_components
+from constrainedmf.companion.plotting import decomp_plot
+from constrainedmf.nmf.utils import sweep_components
 
 torch.manual_seed(1234)
 np.random.seed(1234)
@@ -30,7 +30,7 @@ def get_data(data_dir=None):
 
 def standard_nmf(X):
     nmf = NMF(X.shape, 4)
-    n_iter = nmf.fit(X, beta=2, tol=1e-8, max_iter=1000)
+    nmf.fit(X, beta=2, tol=1e-8, max_iter=1000)
     return nmf
 
 
@@ -43,12 +43,12 @@ def plot_adjustments(axes):
         ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
         ax.set_yticklabels([0, 0.25, 0.5, 0.75, 1])
         ax.set_xlabel("Temperature [K]")
-        ax.set_ylabel("$x_\Phi$")
+        ax.set_ylabel("$x_\Phi$")  # noqa: W605
         ax.set_xlim(150, 445)
 
 
 def make_plots():
-    from deepnmf.nmf.utils import iterative_nmf
+    from constrainedmf.nmf.utils import iterative_nmf
 
     T, X = get_data()
     figs = list()

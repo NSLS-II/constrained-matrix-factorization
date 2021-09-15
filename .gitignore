@@ -45,6 +45,7 @@ Thumbs.db
 .project
 .pydevproject
 .idea/*
+*.egg-info
 
 # Directories to ignore #
 #######################
@@ -53,3 +54,5 @@ Thumbs.db
 /data
 example_scripts/example_output/
 */tmp/*
+venv
+docs
