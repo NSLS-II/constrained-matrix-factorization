@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from deepnmf.nmf.metrics import Beta_divergence
+from constrainedmf.nmf.metrics import Beta_divergence
 
 
 def _mu_update(param, pos, gamma, l1_reg, l2_reg):
@@ -181,9 +181,9 @@ class NMFBase(nn.Module):
 
             if not n_iter:
                 loss_init = loss
-            elif (previous_loss - loss) / loss_init < tol:
+            elif (previous_loss - loss) / loss_init < tol:  # noqa: F821
                 break
-            previous_loss = loss
+            previous_loss = loss  # noqa:F841
 
         return n_iter
 

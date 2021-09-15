@@ -118,13 +118,13 @@ def summary_plot(
     norm = mpl.colors.Normalize(vmin=0, vmax=n_components)
 
     # Create alternative ordinate for the waterfall/stacking
-    if not alt_ordinate is None:
+    if alt_ordinate is not None:
         idxs, labels = list(
             zip(*sorted(zip(range(sub_I.shape[0]), alt_ordinate), key=lambda x: x[1]))
         )
     else:
         idxs = list(range(sub_I.shape[0]))
-        labels = list(range(sub_I.shape[0]))
+
     xs = sub_Q[idxs, :]
     ys = sub_I[idxs, :]
     alphas = alphas[idxs, :]
@@ -146,7 +146,7 @@ def summary_plot(
             alpha = (alphas[:, i_a] - np.min(alphas[:, i_a])) / (
                 np.max(alphas[:, i_a]) - np.min(alphas[:, i_a])
             )
-            ax = waterfall(ax, xs, ys, alpha, color=color, offset=offset)
+            waterfall(ax, xs, ys, alpha, color=color, offset=offset)
         else:
             ax.set_visible = False
 

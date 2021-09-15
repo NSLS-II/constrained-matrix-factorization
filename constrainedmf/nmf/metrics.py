@@ -1,4 +1,3 @@
-import torch
 from operator import mul
 from functools import reduce
 from torch.nn import functional as F

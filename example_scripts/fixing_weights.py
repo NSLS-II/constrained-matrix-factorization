@@ -1,7 +1,7 @@
-from deepnmf.nmf.models import NMF
+from constrainedmf.nmf.models import NMF
 import numpy as np
 import torch
-from deepnmf.companion.plotting import toy_plot
+from constrainedmf.companion.plotting import toy_plot
 
 torch.manual_seed(1234)
 np.random.seed(1234)
@@ -25,7 +25,7 @@ def construct_overlap(n_features=1000, m_patterns=21, mu=1.2, sig=1):
 
 def standard_nmf(X):
     nmf = NMF(X.shape, n_components=2)
-    n_iter = nmf.fit(torch.tensor(X), beta=2)
+    nmf.fit(torch.tensor(X), beta=2)
     return nmf
 
 
@@ -40,7 +40,7 @@ def constrained_nmf(X):
         initial_weights=input_W,
         fix_weights=[True for _ in range(len(input_W))],
     )
-    n_iter = nmf.fit(torch.tensor(X), beta=2)
+    nmf.fit(torch.tensor(X), beta=2)
     return nmf
 
 

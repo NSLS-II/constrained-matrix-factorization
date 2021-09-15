@@ -2,8 +2,8 @@ from pathlib import Path
 import numpy as np
 from time import sleep, time
 import matplotlib.pyplot as plt
-from deepnmf.companion.nmf import decomposition, iterative_decomposition
-from deepnmf.companion.plotting import summary_plot
+from constrainedmf.companion.nmf import decomposition, iterative_decomposition
+from constrainedmf.companion.plotting import summary_plot
 from IPython import display
 
 
@@ -83,7 +83,7 @@ class DirectoryAgent:
         # TODO: Elegantly understand if I'm in a GUI or in ipython inline
         try:
             self.fig.canvas.manager.show()
-        except:
+        except:  # noqa: E722
             display.display(self.fig)
 
         if file_ordering is None:
@@ -155,7 +155,8 @@ class DirectoryAgent:
         """
         Starts the spin to read new files and append their classifications to the output and internal dictionary
         If a single pass of the data_directory is required, use a short or negative timeout time.
-        This can be run as a multiprocessing.Process target with a Manager to retain the output list if being run dynamically.
+        This can be run as a multiprocessing.Process target with a Manager
+        to retain the output list if being run dynamically.
 
         Parameters
         ----------
@@ -164,7 +165,8 @@ class DirectoryAgent:
         verbose: bool
             Print classifications to screen
         timeout: float
-            Time to wait before stop spinning. Default is infinite spin. If a single pass is required, use a negative value.
+            Time to wait before stop spinning. Default is infinite spin.
+            If a single pass is required, use a negative value.
 
         Returns
         -------
@@ -211,7 +213,7 @@ class DirectoryAgent:
         fig, axes
         """
         import torch
-        from deepnmf.nmf.utils import sweep_components
+        from constrainedmf.nmf.utils import sweep_components
 
         xs, ys = self.load_files(self.path_list())
         Y = torch.tensor(ys)

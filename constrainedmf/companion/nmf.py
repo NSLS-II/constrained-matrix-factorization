@@ -1,6 +1,6 @@
 "Non-negative matrix factorization of full datasets"
-from deepnmf.nmf.models import NMF, NMFD
-from deepnmf.nmf.utils import iterative_nmf
+from constrainedmf.nmf.models import NMF, NMFD
+from constrainedmf.nmf.utils import iterative_nmf
 import torch
 import numpy as np
 
