@@ -1,6 +1,6 @@
-=======
+================================
 Constrained Matrix Factorization
-=======
+================================
 
 .. image:: https://img.shields.io/travis/maffettone/constrained-matrix-factorization.svg
         :target: https://travis-ci.org/maffettone/constrained-matrix-factorization
