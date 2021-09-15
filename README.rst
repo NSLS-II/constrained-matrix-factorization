@@ -31,4 +31,5 @@ Install from github::
     $ python -m pip install --upgrade pip wheel
     $ python -m pip install -r requirements-dev.txt
     $ pre-commit install
+    $ python -m pip install -e .
 
