@@ -9,7 +9,7 @@ exclude =
     docs/source/conf.py
 
 per-file-ignores =
-    constrainedmf/companion/nmf:E741
+    constrainedmf/companion/nmf.py:E741
 
 ignore = E203, W503
 max-line-length = 121
