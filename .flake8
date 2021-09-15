@@ -5,8 +5,12 @@ exclude =
     build,
     dist,
     versioneer.py,
-    deepnmf/_version.py,
+    constrainedmf/_version.py,
     docs/source/conf.py
+
+per-file-ignores =
+    constrainedmf/companion/nmf:E741
+
 ignore = E203, W503
 max-line-length = 121
 max-complexity = 18
