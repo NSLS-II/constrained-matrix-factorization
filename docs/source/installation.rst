@@ -4,4 +4,4 @@ Installation
 
 At the command line::
 
-    $ pip install constrainedmf
+    $ pip install constrained-matrix-factorization

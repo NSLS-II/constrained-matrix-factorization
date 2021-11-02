@@ -2,7 +2,7 @@
 Usage
 =====
 
-Start by importing constrained-matrix-factorization.
+Start by importing Constrained Matrix Factorization.
 
 .. code-block:: python
 

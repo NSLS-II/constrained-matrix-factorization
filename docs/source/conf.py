@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# constrained-matrix-factorization documentation build configuration file, created by
+# Constrained Matrix Factorization documentation build configuration file, created by
 # sphinx-quickstart on Thu Jun 28 12:35:56 2018.
 #
 # This file is execfile()d with the current directory set to its
@@ -67,8 +67,8 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = "constrained-matrix-factorization"
-copyright = "2021, Phil Maffettone"
+project = "Constrained Matrix Factorization"
+copyright = "2021, Brookhaven National Lab"
 author = "Phil Maffettone"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -138,7 +138,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "constrainedmf"
+htmlhelp_basename = "constrained-matrix-factorization"
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -164,8 +164,8 @@ latex_elements = {
 latex_documents = [
     (
         master_doc,
-        "constrainedmf.tex",
-        "constrained-matrix-factorization Documentation",
+        "constrained-matrix-factorization.tex",
+        "Constrained Matrix Factorization Documentation",
         "Contributors",
         "manual",
     ),
@@ -179,8 +179,8 @@ latex_documents = [
 man_pages = [
     (
         master_doc,
-        "constrainedmf",
-        "constrained-matrix-factorization Documentation",
+        "constrained-matrix-factorization",
+        "Constrained Matrix Factorization Documentation",
         [author],
         1,
     )
@@ -195,11 +195,11 @@ man_pages = [
 texinfo_documents = [
     (
         master_doc,
-        "constrainedmf",
-        "constrained-matrix-factorization Documentation",
+        "constrained-matrix-factorization",
+        "Constrained Matrix Factorization Documentation",
         author,
-        "constrainedmf",
-        "Advancements on non-negative matrix factorization in PyTorch, with crystallography as a primary use case.",
+        "constrained-matrix-factorization",
+        "Advancements on non-negative matrix factorization in PyTorch, with crystallography as a primary use case. ",
         "Miscellaneous",
     ),
 ]
