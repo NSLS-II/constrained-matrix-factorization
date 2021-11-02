@@ -2,6 +2,9 @@
 Examples
 ========
 
+A suite of example scripts are provided in `example_scripts` to reproduce the  results of `this paper <https://arxiv.org/abs/2104.00864>`_.
+
+
 Fixing components in a "toy" problem
 ------------------------------------
 
