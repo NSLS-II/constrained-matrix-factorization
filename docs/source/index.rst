@@ -10,6 +10,8 @@ Constrained Matrix Factorization Documentation
    :maxdepth: 2
 
    installation
-   usage
+   nativeCMF
+   companions
+   examples
    release-history
    min_versions
