@@ -26,7 +26,7 @@ Install from github::
 
     $ python3 -m venv nmf_env
     $ source nmf_env/bin/activate
-    $ git clone https://github.com/maffettone/constrained-matrix-factorization
+    $ git clone https://github.com/nsls-ii/constrained-matrix-factorization
     $ cd constrained-matrix-factorization
     $ python -m pip install --upgrade pip wheel
     $ python -m pip install -r requirements-dev.txt
