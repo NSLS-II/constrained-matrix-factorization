@@ -8,6 +8,7 @@
 *.so
 *.pyc
 .classpath
+*build
 
 # Packages #
 ############
@@ -55,4 +56,3 @@ Thumbs.db
 example_scripts/example_output/
 */tmp/*
 venv
-docs
