@@ -39,14 +39,14 @@ with open(path.join(here, "requirements.txt")) as requirements_file:
 
 
 setup(
-    name="constrainedmf",
+    name="constrained-matrix-factorization",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description="Advancements on non-negative matrix factorization in PyTorch, with crystallography as a primary use case.",
     long_description=readme,
     author="Phil Maffettone",
     author_email="pmaffettone@bnl.gov",
-    url="https://github.com/maffettone/constrained-matrix-factorization",
+    url="https://github.com/NSLS-II/constrained-matrix-factorization",
     python_requires=">={}".format(".".join(str(n) for n in min_version)),
     packages=find_packages(exclude=["docs", "tests"]),
     entry_points={
