@@ -7,6 +7,12 @@ At the command line::
     $ pip install constrained-matrix-factorization
 
 
+
+.. warning::
+
+   This is currently under rapid development, the API may change at
+   any time.
+
 Developer's Instructions
 ------------------------
 
