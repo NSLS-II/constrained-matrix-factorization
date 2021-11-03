@@ -27,7 +27,7 @@ jobs:
         TWINE_USERNAME: __token__
         # The PYPI_PASSWORD must be a pypi token with the "pypi-" prefix with sufficient permissions to upload this package
         # https://pypi.org/help/#apitoken
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_CMF_PASSWORD }}
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
