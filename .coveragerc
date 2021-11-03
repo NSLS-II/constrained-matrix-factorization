@@ -1,6 +1,6 @@
 [run]
 source =
-    deepnmf
+    constrainedmf
 [report]
 omit =
     */python?.?/*
