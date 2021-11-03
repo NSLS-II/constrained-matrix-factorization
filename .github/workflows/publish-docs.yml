@@ -3,11 +3,11 @@ name: Publish Documentation
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
-    if: github.repository_owner == 'bluesky'
+    if: github.repository_owner == 'nsls-ii'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -46,15 +46,11 @@ jobs:
       shell: bash -l {0}
       run: make -C docs/ html
 
-    - name: Deploy documentation to blueskyproject.io.
+    - name: Deploy documentation
       # We pin to the SHA, not the tag, for security reasons.
       # https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/security-hardening-for-github-actions#using-third-party-actions
       uses: peaceiris/actions-gh-pages@bbdfb200618d235585ad98e965f4aafc39b4c501  # v3.7.3
       with:
         deploy_key: ${{ secrets.ACTIONS_DOCUMENTATION_DEPLOY_KEY }}
-        publish_branch: master
+        publish_branch: gh-pages
         publish_dir: ./docs/build/html
-        external_repository: bluesky/bluesky.github.io
-        destination_dir: ${{ env.REPOSITORY_NAME }}  # just the repo name, without the "bluesky/"
-        keep_files: true  # Keep old files.
-        force_orphan: false  # Keep git history.
