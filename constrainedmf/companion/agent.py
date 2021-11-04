@@ -3,7 +3,7 @@ import numpy as np
 from time import sleep, time
 import matplotlib.pyplot as plt
 from constrainedmf.companion.nmf import decomposition, iterative_decomposition
-from constrainedmf.companion.plotting import summary_plot
+from constrainedmf.utils.plotting import summary_plot
 from IPython import display
 
 

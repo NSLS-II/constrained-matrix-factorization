@@ -1,7 +1,7 @@
 from constrainedmf.nmf.models import NMF
 import numpy as np
 import torch
-from constrainedmf.companion.plotting import toy_plot
+from constrainedmf.utils.plotting import toy_plot
 
 torch.manual_seed(1234)
 np.random.seed(1234)
