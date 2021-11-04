@@ -37,7 +37,7 @@ Install from github::
 
 Original Publication
 --------------------
-This work was originally published on `the arXive here of this paper <https://arxiv.org/abs/2104.00864>`_.
+This work was originally published on `the arXiv here of this paper <https://arxiv.org/abs/2104.00864>`_.
 It has since been peer reviewd and published in `Applied Physics Reviews <https://doi.org/10.1063/5.0052859>`_.
 
 Abstract

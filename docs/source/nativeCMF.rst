@@ -16,7 +16,7 @@ It also allows for portions of the matricies to be initialized, and fixed.
 Simple NMF
 ----------
 
-A simple example of NMF can be accomplished with the following, starting from a matrix of 30 different 100 member vectors.
+A simple, albeit nonsensical, example of NMF can be accomplished with the following, starting from a matrix of 30 different 100 member vectors.
 We can constrain the components to be zeros and ones, and allow a third component to approximate the variation.
 
 .. code-block:: python
