@@ -1,4 +1,4 @@
-"Non-negative matrix factorization of full datasets"
+"""Non-negative matrix factorization of full datasets for total scattering experiments (XRD, PDF)"""
 from constrainedmf.nmf.models import NMF, NMFD
 from constrainedmf.nmf.utils import iterative_nmf
 import torch
@@ -7,7 +7,7 @@ import numpy as np
 
 def decomposition(
     Q,
-    I,
+    I,  # noqa: E741
     n_components=3,
     q_range=None,
     initial_components=None,
@@ -164,7 +164,7 @@ def decomposition(
 
 def iterative_decomposition(
     Q,
-    I,
+    I,  # noqa: E741
     n_components=3,
     q_range=None,
     mode="Linear",
