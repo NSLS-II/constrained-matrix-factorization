@@ -2,7 +2,7 @@ from constrainedmf.nmf.models import NMF
 import numpy as np
 import torch
 from pathlib import Path
-from constrainedmf.companion.plotting import decomp_plot
+from constrainedmf.utils.plotting import decomp_plot
 from constrainedmf.nmf.utils import sweep_components
 
 torch.manual_seed(1234)
