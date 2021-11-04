@@ -8,11 +8,6 @@ At the command line::
 
 
 
-.. warning::
-
-   This is currently under rapid development, the API may change at
-   any time.
-
 Developer's Instructions
 ------------------------
 

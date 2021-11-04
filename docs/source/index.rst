@@ -5,6 +5,10 @@
 
 Constrained Matrix Factorization Documentation
 ==============================================
+.. warning::
+
+   This is currently under rapid development, the API may change at
+   any time. We suggest paying careful attention to the version number you are using.
 
 .. toctree::
    :maxdepth: 2
