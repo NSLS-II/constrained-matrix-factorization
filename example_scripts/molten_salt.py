@@ -73,9 +73,9 @@ def make_plots(n_components=4):
 if __name__ == "__main__":
     path = Path(__file__).parent / "example_output"
     path.mkdir(exist_ok=True)
-    n = 6
-    figs = make_plots(n)
-    for i, fig in enumerate(figs):
-        fig.tight_layout()
-        fig.show()
-        fig.savefig(path / f"molten_salts_{n}_{i}.png")
+    for n in (3, 4, 5):
+        figs = make_plots(n)
+        for i, fig in enumerate(figs):
+            fig.tight_layout()
+            fig.show()
+            fig.savefig(path / f"molten_salts_{n}_{i}.png")

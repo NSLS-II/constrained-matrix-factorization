@@ -15,8 +15,8 @@ Install from github
 
 .. code-block:: bash
 
-    $ python3 -m venv nmf_env
-    $ source nmf_env/bin/activate
+    $ python3 -m venv cmf_env
+    $ source cmf_env/bin/activate
     $ git clone https://github.com/nsls-ii/constrained-matrix-factorization
     $ cd constrained-matrix-factorization
     $ python -m pip install --upgrade pip wheel
