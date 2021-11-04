@@ -53,16 +53,27 @@ class NMFBase(nn.Module):
     ):
         """
         Base class for setting up NMF
-        W is (m_examples, n_components) or (m_examples, n_components, kernel_width)
-        H is (n_components, n_example_features)
-        W @ H give reconstruction of X.
+
         Parameters
         ----------
-        W_shape
-        H_shape
-        n_components
-        initial_components
-        fix_components
+        W_shape: tuple of int
+            Shape of the weights matrix
+        H_shape: tuple of int
+            Shape of the components matrix
+        n_components: int
+            Number of components in the factorization
+        initial_components: list of torch.Tensor
+            Initial components for the factorization
+        fix_components: list of bool
+            Corresponding directive to fix each component in the factorization.
+            The components are ordered, and the default behavior is to allow a component to vary.
+            I.e. (True, False, True) for a 4 component factorization will result in the first and third
+            component being fixed, while the second and fourth vary.
+        initial_weights: list of torch.Tensor
+            Initial weights for the factorization
+        fix_weights: list of bool
+            Corresponding directive to fix each weight in the factorization.
+
         """
         super().__init__()
         self.fix_neg = nn.Threshold(0.0, 1e-8)
@@ -113,12 +124,58 @@ class NMFBase(nn.Module):
         return self.reconstruct(H, W)
 
     def reconstruct(self, H, W):
+        """
+        Method for reconstructing the approximate input matrix from the components and weights
+
+        Parameters
+        ----------
+        H: torch.Tensor
+            Components matrix
+        W: torch.Tensor
+            Weights matrix
+
+        Returns
+        -------
+
+        """
         raise NotImplementedError
 
     def get_W_positive(self, WH, beta, H_sum) -> (torch.Tensor, None or torch.Tensor):
+        """
+        Get the positive denominator (mu) and H sum for W update
+
+        Parameters
+        ----------
+        WH: torch.Tensor
+            Reconstruction of input matrix (in the simple case this is the matrix produce W @ H
+        beta: int, float
+            Value for beta divergence
+        H_sum: torch.Tensor, None
+            Sum over components matrix to use in denominator of update. If unknown or not required use None.
+
+        Returns
+        -------
+
+        """
         raise NotImplementedError
 
     def get_H_positive(self, WH, beta, W_sum) -> (torch.Tensor, None or torch.Tensor):
+        """
+        Get the positive denominator (mu) and W sum for H update
+
+        Parameters
+        ----------
+        WH: torch.Tensor
+            Reconstruction of input matrix (in the simple case this is the matrix produce W @ H
+        beta: int, float
+            Value for beta divergence
+        W_sum: torch.Tensor, None
+            Sum over weights matrix to use in denominator of update. If unknown or not required use None.
+
+        Returns
+        -------
+
+        """
         raise NotImplementedError
 
     def fit(
@@ -132,6 +189,23 @@ class NMFBase(nn.Module):
         alpha=0,
         l1_ratio=0,
     ):
+        """
+
+        Parameters
+        ----------
+        X
+        update_W
+        update_H
+        beta
+        tol
+        max_iter
+        alpha
+        l1_ratio
+
+        Returns
+        -------
+
+        """
 
         X = X.type(torch.float)
         X = self.fix_neg(X)
@@ -194,6 +268,24 @@ class NMFBase(nn.Module):
 
 class NMF(NMFBase):
     def __init__(self, X_shape, n_components, **kwargs):
+        """
+        Standard NMF with ability for constraints constructed from input matrix shape.
+
+        W is (m_examples, n_components)
+
+        H is (n_components, n_example_features)
+
+        W @ H give reconstruction of X.
+
+        Parameters
+        ----------
+        X_shape: tuple
+            Tuple of ints describing shape of input matrix
+        n_components: int
+            Number of desired components for the matrix factorization
+        kwargs: dict
+            For available kwargs see documentation on NMFBase
+        """
         self.m_examples, self.n_features = X_shape
         super().__init__(
             (self.m_examples, n_components),
@@ -203,6 +295,21 @@ class NMF(NMFBase):
         )
 
     def reconstruct(self, H, W):
+        """
+        Reconstructs the approximate input matrix from matrix product of weights and components
+
+        Parameters
+        ----------
+        H: torch.Tensor
+            Components matrix
+        W: torch.Tensor
+            Weights matrix
+
+        Returns
+        -------
+        torch.Tensor
+
+        """
         return W @ H
 
     def get_W_positive(self, WH, beta, H_sum):
@@ -237,6 +344,13 @@ class NMF(NMFBase):
 
 
 class NMFD(NMFBase):
+    """
+    Deconvolutional NMF
+    W is (m_examples, n_components, kernel_width)
+
+    H is (n_components, n_example_features)
+    """
+
     def __init__(self, X_shape, n_components, T=1, **kwargs):
         self.m_examples, self.n_features = X_shape
         self.pad_size = T - 1

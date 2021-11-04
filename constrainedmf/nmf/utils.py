@@ -38,6 +38,7 @@ def scalar_to_vec(x, k, dist="unif", nsig=3):
 def sweep_components(X, n_max=None, n_min=2):
     """
     Sweeps over all values of n_components and returns a plot of losses vs n_components
+
     Parameters
     ----------
     X : Tensor
