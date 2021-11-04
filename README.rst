@@ -2,8 +2,8 @@
 Constrained Matrix Factorization
 ================================
 
-.. image:: https://img.shields.io/travis/nsls-ii/constrained-matrix-factorization.svg
-        :target: https://travis-ci.org/nsls-ii/constrained-matrix-factorization
+.. image:: https://img.shields.io/github/workflow/status/nsls-ii/constrained-matrix-factorization/Unit%20Tests
+        :target: https://github.com/nsls-ii/constrained-matrix-factorization/actions?query=workflow%3A%22Unit+Tests%22+branch%3Amain
 
 .. image:: https://img.shields.io/pypi/v/constrained-matrix-factorization.svg
         :target: https://pypi.python.org/pypi/constrained-matrix-factorization
@@ -12,7 +12,7 @@ Constrained Matrix Factorization
 Advancements on non-negative matrix factorization in PyTorch, with crystallography as a primary use case. 
 
 * Free software: 3-clause BSD license
-* Documentation: (COMING SOON!) https://nsls-ii.github.io/constrained-matrix-factorization.
+* Documentation: https://nsls-ii.github.io/constrained-matrix-factorization.
 
 Features
 --------
