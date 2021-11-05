@@ -5,9 +5,51 @@ import torch
 import numpy as np
 
 
+def _decomposition_preprocess(*, Q, I, q_range, bkg_removal, normalize):  # noqa: E741
+    """Preprocess options for trimming q-range, removing background, and normalization"""
+    if q_range is None:
+        idx_min = 0
+        idx_max = I.shape[1]
+    else:
+        idx_min = (
+            np.where(Q[0, :] < q_range[0])[0][-1]
+            if len(np.where(Q[0, :] < q_range[0])[0])
+            else 0
+        )
+        idx_max = (
+            np.where(Q[0, :] > q_range[1])[0][0]
+            if len(np.where(Q[0, :] > q_range[1])[0])
+            else I.shape[1]
+        )
+
+    sub_I = I[:, idx_min:idx_max]
+    sub_Q = Q[:, idx_min:idx_max]
+
+    # Data manipulation
+    if bkg_removal:
+        import peakutils
+
+        bases = []
+        for i in range(sub_I.shape[0]):
+            bases.append(peakutils.baseline(sub_I[i, :], deg=bkg_removal))
+        bases = np.stack(bases)
+        sub_I = sub_I - bases
+    if normalize:
+        sub_I = (sub_I - np.min(sub_I, axis=1, keepdims=True)) / (
+            np.max(sub_I, axis=1, keepdims=True) - np.min(sub_I, axis=1, keepdims=True)
+        )
+
+    # Numerical stability of non-negativity
+    if np.min(sub_I) < 0:
+        sub_I = sub_I - np.min(sub_I, axis=1, keepdims=True)
+
+    return sub_Q, sub_I, idx_min, idx_max
+
+
 def decomposition(
     Q,
     I,  # noqa: E741
+    *,
     n_components=3,
     q_range=None,
     initial_components=None,
@@ -17,6 +59,7 @@ def decomposition(
     max_iter=1000,
     bkg_removal=None,
     normalize=False,
+    device=None,
     **kwargs,
 ):
     """
@@ -57,6 +100,8 @@ def decomposition(
         Integer degree for peakutils background removal
     normalize: bool, optional
         Flag for min-max normalization
+    device: str, torch.device, None
+            Device for matrix factorization to proceed on. Defaults to cpu.
     **kwargs: dict
         Arguments passed to the fit method. See nmf.models.NMFBase.
 
@@ -73,42 +118,9 @@ def decomposition(
 
     """
 
-    # Data subselection
-    if q_range is None:
-        idx_min = 0
-        idx_max = I.shape[1]
-    else:
-        idx_min = (
-            np.where(Q[0, :] < q_range[0])[0][-1]
-            if len(np.where(Q[0, :] < q_range[0])[0])
-            else 0
-        )
-        idx_max = (
-            np.where(Q[0, :] > q_range[1])[0][0]
-            if len(np.where(Q[0, :] > q_range[1])[0])
-            else I.shape[1]
-        )
-
-    sub_I = I[:, idx_min:idx_max]
-    sub_Q = Q[:, idx_min:idx_max]
-
-    # Data manipulation
-    if bkg_removal:
-        import peakutils
-
-        bases = []
-        for i in range(sub_I.shape[0]):
-            bases.append(peakutils.baseline(sub_I[i, :], deg=bkg_removal))
-        bases = np.stack(bases)
-        sub_I = sub_I - bases
-    if normalize:
-        sub_I = (sub_I - np.min(sub_I, axis=1, keepdims=True)) / (
-            np.max(sub_I, axis=1, keepdims=True) - np.min(sub_I, axis=1, keepdims=True)
-        )
-
-    # Numerical stability of non-negativity
-    if np.min(sub_I) < 0:
-        sub_I = sub_I - np.min(sub_I, axis=1, keepdims=True)
+    sub_Q, sub_I, idx_min, idx_max = _decomposition_preprocess(
+        Q=Q, I=I, q_range=q_range, bkg_removal=bkg_removal, normalize=normalize
+    )
 
     # Initial components
     if mode != "Deconvolutional":
@@ -139,6 +151,7 @@ def decomposition(
             n_components,
             initial_components=input_H,
             fix_components=fix_components,
+            device=device,
         )
     elif mode == "Deconvolutional":
         model = NMFD(
@@ -147,6 +160,7 @@ def decomposition(
             T=kernel_width,
             initial_components=input_H,
             fix_components=fix_components,
+            device=device,
         )
     else:
         raise NotImplementedError
@@ -165,51 +179,61 @@ def decomposition(
 def iterative_decomposition(
     Q,
     I,  # noqa: E741
+    *,
     n_components=3,
     q_range=None,
     mode="Linear",
     kernel_width=1,
-    max_iter=1000,
     bkg_removal=None,
     normalize=False,
     **kwargs,
 ):
-    # Data subselection
-    if q_range is None:
-        idx_min = 0
-        idx_max = I.shape[1]
-    else:
-        idx_min = (
-            np.where(Q[0, :] < q_range[0])[0][-1]
-            if len(np.where(Q[0, :] < q_range[0])[0])
-            else 0
-        )
-        idx_max = (
-            np.where(Q[0, :] > q_range[1])[0][0]
-            if len(np.where(Q[0, :] > q_range[1])[0])
-            else I.shape[1]
-        )
+    """
+    Iterative decomposition by performing constrained NMF using dataset memebers as constraints.
+    The first 2 constraints are the end members of the dataset.
+    The next constraint is chosen by examining the most prominent (heavily weighted) learned component.
+    The index where this component's weight is the highest, is used to select the next constraint from the dataset.
+    This continues until all components are constrained by dataset memebrs.
 
-    sub_I = I[:, idx_min:idx_max]
-    sub_Q = Q[:, idx_min:idx_max]
+    Parameters
+    ----------
+    Q : array
+        Ordinate Q for I(Q). Assumed to be rank 2, shape (m_patterns, n_data)
+    I : array
+        The intensity values for each Q, assumed to be the same shape as Q. (m_patterns, n_data)
+    n_components: int
+        Number of components for NMF
+    q_range : tuple, list
+        (Min, Max) Q values for consideration in NMF. This enables a focused region for decomposition.
+    mode: {"Linear", "Deconvolutional"}
+        Operating mode
+    kernel_width: int
+        Width of 1-dimensional convolutional kernel
+    bkg_removal: int, optional
+        Integer degree for peakutils background removal
+    normalize: bool, optional
+        Flag for min-max normalization
+    kwargs: dict
+        Keyword arguments first get passed to nmf.utils.iterative_nmf to control fit parameters.
+        Fit parameters include beta, alpha, tol, max_iter.
+        Keyword arguments are then passed to the class initialization.
+        Common init parameters include device, or initial_weights
 
-    # Data manipulation
-    if bkg_removal:
-        import peakutils
+    Returns
+    -------
+    sub_Q: array
+        Subselected region of Q
+    sub_I: array
+        Subselected region of I
+    weights: array
+        Final weights from NMF
+    components: array
+        Final components from NMF
 
-        bases = []
-        for i in range(sub_I.shape[0]):
-            bases.append(peakutils.baseline(sub_I[i, :], deg=bkg_removal))
-        bases = np.stack(bases)
-        sub_I = sub_I - bases
-    if normalize:
-        sub_I = (sub_I - np.min(sub_I, axis=1, keepdims=True)) / (
-            np.max(sub_I, axis=1, keepdims=True) - np.min(sub_I, axis=1, keepdims=True)
-        )
-
-    # Numerical stability of non-negativity
-    if np.min(sub_I) < 0:
-        sub_I = sub_I - np.min(sub_I, axis=1, keepdims=True)
+    """
+    sub_Q, sub_I, idx_min, idx_max = _decomposition_preprocess(
+        Q=Q, I=I, q_range=q_range, bkg_removal=bkg_removal, normalize=normalize
+    )
 
     if mode == "Deconvolutional":
         nmf_class = NMFD
@@ -228,7 +252,6 @@ def iterative_decomposition(
         nmf_class,
         torch.tensor(sub_I, dtype=torch.float),
         n_components=n_components,
-        max_iter=max_iter,
         kernel_width=kernel_width,
         **kwargs,
     )
@@ -237,8 +260,8 @@ def iterative_decomposition(
     W = nmf.W
     H = nmf.H
     if len(W.shape) > 2:
-        alphas = torch.mean(W, 2).data.numpy()
+        weights = torch.mean(W, 2).data.numpy()
     else:
-        alphas = W.data.numpy()
+        weights = W.data.numpy()
     components = H.data.numpy()
-    return sub_Q, sub_I, alphas, components
+    return sub_Q, sub_I, weights, components
