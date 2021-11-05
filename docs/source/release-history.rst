@@ -3,14 +3,14 @@ Release History
 ===============
 
 
-v0.1.1 (?)
+v0.1.1 (2021-11-?)
 -------------------
 
-- Documentation
-- Refactor of companions and wrappers (wrappers wrap functionality, companions have ask, tell, report)
-- GPU Functionality
-- Required kwargs on functions
+- Refactor of companions and wrappers: wrappers wrap functionality; companions have :code:`ask, tell, report` methods.
+- CUDA and GPU Functionality added to base classes, utility functions, and total scattering
+- Required kwargs on functions, instead of allowing positional.
 - Numerical instability patch for when positive comps (mu denominator in multiplicative update) are 0.
+- Added much more documentation.
 
 v0.1.0 (2021-11-01)
 -------------------
