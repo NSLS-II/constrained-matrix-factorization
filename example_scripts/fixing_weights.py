@@ -5,6 +5,7 @@ from constrainedmf.utils.plotting import toy_plot
 
 torch.manual_seed(1234)
 np.random.seed(1234)
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def gaussian(x, mu, sig):
@@ -24,7 +25,7 @@ def construct_overlap(n_features=1000, m_patterns=21, mu=1.2, sig=1):
 
 
 def standard_nmf(X):
-    nmf = NMF(X.shape, n_components=2)
+    nmf = NMF(X.shape, n_components=2, device=DEVICE)
     nmf.fit(torch.tensor(X), beta=2)
     return nmf
 
@@ -39,6 +40,7 @@ def constrained_nmf(X):
         n_components=2,
         initial_weights=input_W,
         fix_weights=[True for _ in range(len(input_W))],
+        device=DEVICE,
     )
     nmf.fit(torch.tensor(X), beta=2)
     return nmf
