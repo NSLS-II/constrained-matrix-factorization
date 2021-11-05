@@ -5,6 +5,26 @@ from constrainedmf.nmf.metrics import Beta_divergence
 
 
 def _mu_update(param, pos, gamma, l1_reg, l2_reg):
+    """
+    Perform multiplicative update of param (W, or H)
+
+    Parameters
+    ----------
+    param: tensor
+        Weights or components
+    pos: tensor
+        positive denominator (mu)
+    gamma: float
+        Beta - 1 from Beta divergence loss
+    l1_reg: float
+        L1 regularization
+    l2_reg: float
+        L2 regularization
+
+    Returns
+    -------
+
+    """
     if isinstance(param, nn.ParameterList):
         # Handle no gradients in fixed components
         grad = torch.cat(
@@ -152,7 +172,7 @@ class NMFBase(nn.Module):
 
     def get_W_positive(self, WH, beta, H_sum) -> (torch.Tensor, None or torch.Tensor):
         """
-        Get the positive denominator (mu) and H sum for W update
+        Get the positive denominator an/or H sum for multiplicative W update
 
         Parameters
         ----------
@@ -171,7 +191,7 @@ class NMFBase(nn.Module):
 
     def get_H_positive(self, WH, beta, W_sum) -> (torch.Tensor, None or torch.Tensor):
         """
-        Get the positive denominator (mu) and W sum for H update
+        Get the positive denominator and/or W sum for multiplicative H update
 
         Parameters
         ----------
@@ -240,8 +260,12 @@ class NMFBase(nn.Module):
         l2_reg = alpha * (1 - l1_ratio)
 
         loss_scale = torch.prod(torch.tensor(X.shape)).float()
+        losses = []
 
         H_sum, W_sum = None, None
+
+        if max_iter < 1:
+            raise ValueError("Maximum number of iterations must be at least 1.")
 
         for n_iter in range(max_iter):
             # W update
@@ -275,8 +299,9 @@ class NMFBase(nn.Module):
             elif (previous_loss - loss) / loss_init < tol:  # noqa: F821
                 break
             previous_loss = loss  # noqa:F841
+            losses.append(loss)
 
-        return n_iter
+        return losses
 
     def fit_transform(self, *args, **kwargs):
         n_iter = self.fit(*args, **kwargs)
