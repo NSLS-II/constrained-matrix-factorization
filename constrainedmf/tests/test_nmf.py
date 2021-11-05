@@ -11,8 +11,8 @@ def test_standard_nmf(linearly_mixed_gaussians):
     assert nmf.loss(xs, beta=2) < 0.1
     nmf = NMF(xs.shape, n_components=2)
     nmf.fit(torch.tensor(xs), beta=2, max_iter=500)
-    assert nmf.loss(xs, beta=1) < 10
-    assert nmf.loss(xs, beta=2) < 0.1
+    assert nmf.loss(xs, beta=1) < 10.0
+    assert nmf.loss(xs, beta=2) < 1.0
 
 
 def test_constrained_weights(linearly_mixed_gaussians):
