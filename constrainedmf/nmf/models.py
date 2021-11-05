@@ -79,8 +79,6 @@ class NMFBase(nn.Module):
         self.fix_neg = nn.Threshold(0.0, 1e-8)
         self.rank = n_components
 
-        W = torch.rand(*W_shape)
-        self.W = nn.Parameter(W)
         if initial_weights is not None:
             w_list = [nn.Parameter(weight) for weight in initial_weights]
         else:
