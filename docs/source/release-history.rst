@@ -10,6 +10,7 @@ v0.1.1 (?)
 - Refactor of companions and wrappers (wrappers wrap functionality, companions have ask, tell, report)
 - GPU Functionality
 - Required kwargs on functions
+- Numerical instability patch for when positive comps (mu denominator in multiplicative update) are 0.
 
 v0.1.0 (2021-11-01)
 -------------------
