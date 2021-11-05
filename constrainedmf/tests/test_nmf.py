@@ -6,6 +6,7 @@ def test_standard_nmf(linearly_mixed_gaussians):
     """Test standard NMF using Euclidian loss and KL-divergence loss"""
     xs, weights, components = linearly_mixed_gaussians
     nmf = NMF(xs.shape, n_components=2)
+    # Ensure optimization reaches a reasonable loss
     nmf.fit(torch.tensor(xs), beta=1, max_iter=500)
     assert nmf.loss(xs, beta=1) < 1
     assert nmf.loss(xs, beta=2) < 0.1
@@ -13,6 +14,10 @@ def test_standard_nmf(linearly_mixed_gaussians):
     nmf.fit(torch.tensor(xs), beta=2, max_iter=500)
     assert nmf.loss(xs, beta=1) < 10.0
     assert nmf.loss(xs, beta=2) < 1.0
+    # Ensure weights vary somewhat linearly by asserting max and min are end members
+    weights = nmf.W
+    assert set(int(x) for x in weights.max(dim=0).indices) == {20, 0}
+    assert set(int(x) for x in weights.min(dim=0).indices) == {20, 0}
 
 
 def test_constrained_weights(linearly_mixed_gaussians):
