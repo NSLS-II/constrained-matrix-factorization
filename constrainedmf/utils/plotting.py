@@ -13,7 +13,7 @@ def toy_plot(model, x, Y, weights, components):
     weight_ax = fig.add_subplot(gs[1, 3:])
 
     with torch.no_grad():
-        recon = model.reconstruct(model.H, model.W)
+        recon = model.reconstruct(model.H, model.W).cpu()
 
     ax = recon_axes[0]
     ax.plot(x, Y[0, :], label="Truth")
@@ -27,7 +27,7 @@ def toy_plot(model, x, Y, weights, components):
     for ax in recon_axes:
         ax.legend()
 
-    H = model.H.data.numpy()
+    H = model.H.data.cpu()
     ax = comp_ax
     for i in range(H.shape[0]):
         ax.plot(x, H[i, :], label=f"Learned Component {i}")
@@ -35,7 +35,7 @@ def toy_plot(model, x, Y, weights, components):
     ax.set_title("Learned Components")
     ax.legend()
 
-    W = model.W.data.numpy()
+    W = model.W.data.cpu()
     ax = weight_ax
     for i in range(W.shape[1]):
         ax.plot(W[:, i], label=f"Learned Weights {i}")
