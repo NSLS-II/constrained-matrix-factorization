@@ -14,8 +14,10 @@ def _mu_update(param, pos, gamma, l1_reg, l2_reg):
         return
     else:
         grad = param.grad
-    # prevent negative term, very likely to happen with kl divergence
+    # prevent negative terms and zero division
     multiplier = F.relu(pos - grad, inplace=True)
+    if (pos == 0).sum() > 0:
+        pos.add_(1e-7)
 
     if l1_reg > 0:
         pos.add_(l1_reg)
