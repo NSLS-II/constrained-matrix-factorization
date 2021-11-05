@@ -23,6 +23,14 @@ like F(q), I(2theta), or G(r).
 
 - .. autofunction:: constrainedmf.wrappers.scattering.decomposition
 
+A handy alternative that makes use of :code:`constrainedmf.nmf.utils.iterative_nmf` is the iterative decomposition
+that makes use of the members the dataset to chose constraints for the NMF. This process occurs iteratively, and
+uses the dataset end-members, then the members that produce the maximal information gain of the model.
+Commonly, this function will be used with multiple numbers of components in parallel, feeding the scientist a
+visualization of their dataset in real-time.
+
+- .. autofunction:: constrainedmf.wrappers.scattering.iterative_decomposition
+
 
 Companion agents for bluesky
 ----------------------------
