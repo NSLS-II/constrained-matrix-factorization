@@ -46,3 +46,14 @@ def test_constrained_components(linearly_mixed_gaussians):
     )
     nmf.fit(xs)
     assert torch.all(torch.eq(components, nmf.H))
+
+
+def test_relative_imports():
+    from types import ModuleType
+    import constrainedmf as cmf
+    import constrainedmf.nmf as nmf
+
+    assert isinstance(cmf.nmf, ModuleType)
+    assert issubclass(cmf.NMF, cmf.nmf.models.NMFBase)
+    assert issubclass(cmf.nmf.models.NMF, cmf.nmf.models.NMFBase)
+    assert issubclass(nmf.models.NMF, nmf.models.NMFBase)
