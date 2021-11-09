@@ -37,4 +37,4 @@ Companion agents for bluesky
 
 Building useful companion agents is an active area of development.
 For more insights in how to deploy cmf, check out this repository for
-`experiments at 28-ID PDF <https://github.com/NSLS-II-PDF/federation-of-agents>`_.
+`experiments at 28-ID PDF <https://github.com/NSLS-II-PDF/federation-of-agents/blob/main/federation/nmf/base.py>`_.
