@@ -5,6 +5,26 @@ from constrainedmf.nmf.metrics import Beta_divergence
 
 
 def _mu_update(param, pos, gamma, l1_reg, l2_reg):
+    """
+    Perform multiplicative update of param (W, or H)
+
+    Parameters
+    ----------
+    param: tensor
+        Weights or components
+    pos: tensor
+        positive denominator (mu)
+    gamma: float
+        Beta - 1 from Beta divergence loss
+    l1_reg: float
+        L1 regularization
+    l2_reg: float
+        L2 regularization
+
+    Returns
+    -------
+
+    """
     if isinstance(param, nn.ParameterList):
         # Handle no gradients in fixed components
         grad = torch.cat(
@@ -14,8 +34,10 @@ def _mu_update(param, pos, gamma, l1_reg, l2_reg):
         return
     else:
         grad = param.grad
-    # prevent negative term, very likely to happen with kl divergence
+    # prevent negative terms and zero division
     multiplier = F.relu(pos - grad, inplace=True)
+    if (pos == 0).sum() > 0:
+        pos.add_(1e-7)
 
     if l1_reg > 0:
         pos.add_(l1_reg)
@@ -45,10 +67,12 @@ class NMFBase(nn.Module):
         W_shape,
         H_shape,
         n_components,
+        *,
         initial_components=None,
         fix_components=(),
         initial_weights=None,
         fix_weights=(),
+        device=None,
         **kwargs
     ):
         """
@@ -73,14 +97,20 @@ class NMFBase(nn.Module):
             Initial weights for the factorization
         fix_weights: list of bool
             Corresponding directive to fix each weight in the factorization.
+        device: str, torch.device, None
+            Device for matrix factorization to proceed on. Defaults to cpu.
+        kwargs: dict
+            Keyword arguments for torch.nn.Module
 
         """
         super().__init__()
         self.fix_neg = nn.Threshold(0.0, 1e-8)
         self.rank = n_components
+        if device is None:
+            self.device = torch.device("cpu")
+        else:
+            self.device = torch.device(device)
 
-        W = torch.rand(*W_shape)
-        self.W = nn.Parameter(W)
         if initial_weights is not None:
             w_list = [nn.Parameter(weight) for weight in initial_weights]
         else:
@@ -90,7 +120,7 @@ class NMFBase(nn.Module):
         if fix_weights:
             for i in range(len(fix_weights)):
                 w_list[i].requires_grad = not fix_weights[i]
-        self.W_list = nn.ParameterList(w_list)
+        self.W_list = nn.ParameterList(w_list).to(device)
 
         if initial_components is not None:
             h_list = [nn.Parameter(component) for component in initial_components]
@@ -101,7 +131,7 @@ class NMFBase(nn.Module):
         if fix_components:
             for i in range(len(fix_components)):
                 h_list[i].requires_grad = not fix_components[i]
-        self.H_list = nn.ParameterList(h_list)
+        self.H_list = nn.ParameterList(h_list).to(device)
 
     @property
     def H(self):
@@ -142,7 +172,7 @@ class NMFBase(nn.Module):
 
     def get_W_positive(self, WH, beta, H_sum) -> (torch.Tensor, None or torch.Tensor):
         """
-        Get the positive denominator (mu) and H sum for W update
+        Get the positive denominator an/or H sum for multiplicative W update
 
         Parameters
         ----------
@@ -161,7 +191,7 @@ class NMFBase(nn.Module):
 
     def get_H_positive(self, WH, beta, W_sum) -> (torch.Tensor, None or torch.Tensor):
         """
-        Get the positive denominator (mu) and W sum for H update
+        Get the positive denominator and/or W sum for multiplicative H update
 
         Parameters
         ----------
@@ -190,27 +220,34 @@ class NMFBase(nn.Module):
         l1_ratio=0,
     ):
         """
+        Fit the wights (W) and components (H) to the dataset X.
 
         Parameters
         ----------
-        X
-        update_W
-        update_H
-        beta
-        tol
-        max_iter
-        alpha
-        l1_ratio
+        X: torch.Tensor
+            Tensor of the dataset to fit, shape (m_examples, n_features)
+        update_W: bool
+            Override on updating weights matrix
+        update_H: bool
+            Override on updating components matrix
+        beta: float
+            Value for beta divergence
+        tol: float
+            Change in loss tolerance for exiting optimization loop
+        max_iter: int
+            Maximum number of iterations to consider for optimization loop
+        alpha: float
+            Amount of regularization for the mu update
+        l1_ratio: float
+            Ratio of L1 to L2 regularization
 
         Returns
         -------
 
         """
 
-        X = X.type(torch.float)
+        X = X.type(torch.float).to(self.device)
         X = self.fix_neg(X)
-        # self.W.requires_grad = update_W
-        # self.H.requires_grad = update_H
 
         if beta < 1:
             gamma = 1 / (2 - beta)
@@ -223,8 +260,12 @@ class NMFBase(nn.Module):
         l2_reg = alpha * (1 - l1_ratio)
 
         loss_scale = torch.prod(torch.tensor(X.shape)).float()
+        losses = []
 
         H_sum, W_sum = None, None
+
+        if max_iter < 1:
+            raise ValueError("Maximum number of iterations must be at least 1.")
 
         for n_iter in range(max_iter):
             # W update
@@ -258,8 +299,9 @@ class NMFBase(nn.Module):
             elif (previous_loss - loss) / loss_init < tol:  # noqa: F821
                 break
             previous_loss = loss  # noqa:F841
+            losses.append(loss)
 
-        return n_iter
+        return losses
 
     def fit_transform(self, *args, **kwargs):
         n_iter = self.fit(*args, **kwargs)
@@ -267,7 +309,18 @@ class NMFBase(nn.Module):
 
 
 class NMF(NMFBase):
-    def __init__(self, X_shape, n_components, **kwargs):
+    def __init__(
+        self,
+        X_shape,
+        n_components,
+        *,
+        initial_components=None,
+        fix_components=(),
+        initial_weights=None,
+        fix_weights=(),
+        device=None,
+        **kwargs
+    ):
         """
         Standard NMF with ability for constraints constructed from input matrix shape.
 
@@ -283,14 +336,32 @@ class NMF(NMFBase):
             Tuple of ints describing shape of input matrix
         n_components: int
             Number of desired components for the matrix factorization
+        initial_components: list of torch.Tensor
+            Initial components for the factorization
+        fix_components: list of bool
+            Corresponding directive to fix each component in the factorization.
+            The components are ordered, and the default behavior is to allow a component to vary.
+            I.e. (True, False, True) for a 4 component factorization will result in the first and third
+            component being fixed, while the second and fourth vary.
+        initial_weights: list of torch.Tensor
+            Initial weights for the factorization
+        fix_weights: list of bool
+            Corresponding directive to fix each weight in the factorization.
+        device: str, torch.device, None
+            Device for matrix factorization to proceed on. Defaults to cpu.
         kwargs: dict
-            For available kwargs see documentation on NMFBase
+            kwargs for torch.nn.Module
         """
         self.m_examples, self.n_features = X_shape
         super().__init__(
             (self.m_examples, n_components),
             (n_components, self.n_features),
             n_components,
+            initial_components=initial_components,
+            initial_weights=initial_weights,
+            fix_weights=fix_weights,
+            fix_components=fix_components,
+            device=device,
             **kwargs
         )
 
