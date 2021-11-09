@@ -2,6 +2,13 @@
 Release History
 ===============
 
+NEXT
+----
+
+- Address scope and convenience imports. The nmf module is accesible at the top level, as well as the NMF class.
+  :code:`cmf.nmf...` and :code:`cmf.NMF(...)`.
+- More flexibility at torch level with constraints. Allows for partial initialization of componenents and weights, and
+  partial specification of constraints.
 
 v0.1.1 (2021-11-?)
 -------------------
