@@ -23,10 +23,7 @@ Features
 * Plotting utilities
 * Utilities for "elbow method" and automatic iterative cmf
 
-Wrappers for scientific use cases
-*********************************
 
-* :code:`scattering`: XRD, PDF, TS, SAXS
 
 Developer's Instructions
 ------------------------
