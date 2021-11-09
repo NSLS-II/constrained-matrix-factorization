@@ -304,8 +304,8 @@ class NMFBase(nn.Module):
         return losses
 
     def fit_transform(self, *args, **kwargs):
-        n_iter = self.fit(*args, **kwargs)
-        return n_iter, torch.cat([x for x in self.W_list])
+        self.fit(*args, **kwargs)
+        return self.W
 
 
 class NMF(NMFBase):
