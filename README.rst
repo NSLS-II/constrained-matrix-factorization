@@ -26,7 +26,7 @@ Features
 Wrappers for scientific use cases
 *********************************
 
-* :code:`scattering`_: XRD, PDF, TS, SAXS
+* :code:`scattering`: XRD, PDF, TS, SAXS
 
 Developer's Instructions
 ------------------------
