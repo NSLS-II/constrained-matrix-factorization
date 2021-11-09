@@ -31,5 +31,6 @@ was used as a primary example with rigid constraints in `Applied Physics Reviews
    nativeCMF
    companions
    examples
+   tips-and-tricks
    release-history
    min_versions

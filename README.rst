@@ -17,7 +17,16 @@ Advancements on non-negative matrix factorization in PyTorch, with crystallograp
 Features
 --------
 
-* TODO
+* Torch enabled non-negative matrix factorization
+* Optional input components and/or weights
+* Rigidly constrained specific components or weights
+* Plotting utilities
+* Utilities for "elbow method" and automatic iterative cmf
+
+Wrappers for scientific use cases
+=================================
+
+* :code:`scattering`: XRD, PDF, TS, SAXS
 
 Developer's Instructions
 ------------------------
