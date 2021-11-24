@@ -189,11 +189,11 @@ def iterative_decomposition(
     **kwargs,
 ):
     """
-    Iterative decomposition by performing constrained NMF using dataset memebers as constraints.
+    Iterative decomposition by performing constrained NMF using dataset members as constraints.
     The first 2 constraints are the end members of the dataset.
     The next constraint is chosen by examining the most prominent (heavily weighted) learned component.
     The index where this component's weight is the highest, is used to select the next constraint from the dataset.
-    This continues until all components are constrained by dataset memebrs.
+    This continues until all components are constrained by dataset members.
 
     Parameters
     ----------
