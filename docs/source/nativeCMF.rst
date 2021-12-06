@@ -18,6 +18,8 @@ Simple NMF
 
 A simple, albeit nonsensical, example of NMF can be accomplished with the following, starting from a matrix of 30 different 100 member vectors.
 We can constrain the components to be zeros and ones, and allow a third component to approximate the variation.
+This approach gives us the learning curve of the alternating update algorithm,
+and two numpy arrays of weights and components.
 
 .. code-block:: python
 
@@ -31,7 +33,8 @@ We can constrain the components to be zeros and ones, and allow a third componen
                                3,
                                initial_components=[x_0, x_1],
                                fix_components=[True, True, False])
-    H, W = model.fit_transform(X)
+    loss = model.fit(X) # Learning curve of loss over timesteps
+    learned_weights, learned_components = model.W.detach().numpy(), model.H.detach().numpy()
 
 
 
