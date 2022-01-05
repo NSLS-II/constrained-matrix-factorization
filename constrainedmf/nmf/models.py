@@ -86,16 +86,16 @@ class NMFBase(nn.Module):
             Shape of the components matrix
         n_components: int
             Number of components in the factorization
-        initial_components: list of torch.Tensor
-            Initial components for the factorization
-        fix_components: list of bool
+        initial_components: tuple of torch.Tensor
+            Initial components for the factorization. Shape (1, n_features)
+        fix_components: tuple of bool
             Corresponding directive to fix each component in the factorization.
             The components are ordered, and the default behavior is to allow a component to vary.
             I.e. (True, False, True) for a 4 component factorization will result in the first and third
             component being fixed, while the second and fourth vary.
-        initial_weights: list of torch.Tensor
-            Initial weights for the factorization
-        fix_weights: list of bool
+        initial_weights: tuple of torch.Tensor
+            Initial weights for the factorization. Shape (1, m_examples)
+        fix_weights: tuple of bool
             Corresponding directive to fix each weight in the factorization.
         device: str, torch.device, None
             Device for matrix factorization to proceed on. Defaults to cpu.
@@ -112,7 +112,10 @@ class NMFBase(nn.Module):
             self.device = torch.device(device)
 
         if initial_weights is not None:
-            w_list = [nn.Parameter(weight) for weight in initial_weights]
+            w_list = [nn.Parameter(weight) for weight in initial_weights] + [
+                nn.Parameter(torch.rand(1, *W_shape[1:]))
+                for _ in range(W_shape[0] - len(initial_weights))
+            ]
         else:
             w_list = [
                 nn.Parameter(torch.rand(1, *W_shape[1:])) for _ in range(W_shape[0])
@@ -123,7 +126,10 @@ class NMFBase(nn.Module):
         self.W_list = nn.ParameterList(w_list).to(device)
 
         if initial_components is not None:
-            h_list = [nn.Parameter(component) for component in initial_components]
+            h_list = [nn.Parameter(component) for component in initial_components] + [
+                nn.Parameter(torch.rand(1, *H_shape[1:]))
+                for _ in range(H_shape[0] - len(initial_components))
+            ]
         else:
             h_list = [
                 nn.Parameter(torch.rand(1, *H_shape[1:])) for _ in range(H_shape[0])
@@ -304,8 +310,8 @@ class NMFBase(nn.Module):
         return losses
 
     def fit_transform(self, *args, **kwargs):
-        n_iter = self.fit(*args, **kwargs)
-        return n_iter, torch.cat([x for x in self.W_list])
+        self.fit(*args, **kwargs)
+        return self.W
 
 
 class NMF(NMFBase):
@@ -336,16 +342,16 @@ class NMF(NMFBase):
             Tuple of ints describing shape of input matrix
         n_components: int
             Number of desired components for the matrix factorization
-        initial_components: list of torch.Tensor
-            Initial components for the factorization
-        fix_components: list of bool
+        initial_components: tuple of torch.Tensor
+            Initial components for the factorization. Shape (1, n_features)
+        fix_components: tuple of bool
             Corresponding directive to fix each component in the factorization.
             The components are ordered, and the default behavior is to allow a component to vary.
             I.e. (True, False, True) for a 4 component factorization will result in the first and third
             component being fixed, while the second and fourth vary.
-        initial_weights: list of torch.Tensor
-            Initial weights for the factorization
-        fix_weights: list of bool
+        initial_weights: tuple of torch.Tensor
+            Initial weights for the factorization. Shape (1, m_examples)
+        fix_weights: tuple of bool
             Corresponding directive to fix each weight in the factorization.
         device: str, torch.device, None
             Device for matrix factorization to proceed on. Defaults to cpu.

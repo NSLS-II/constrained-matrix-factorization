@@ -46,3 +46,52 @@ def test_constrained_components(linearly_mixed_gaussians):
     )
     nmf.fit(xs)
     assert torch.all(torch.eq(components, nmf.H))
+
+
+def test_relative_imports():
+    from types import ModuleType
+    import constrainedmf as cmf
+    import constrainedmf.nmf as nmf
+
+    assert isinstance(cmf.nmf, ModuleType)
+    assert issubclass(cmf.NMF, cmf.nmf.models.NMFBase)
+    assert issubclass(cmf.nmf.models.NMF, cmf.nmf.models.NMFBase)
+    assert issubclass(nmf.models.NMF, nmf.models.NMFBase)
+
+
+def test_partial_constraints_init():
+    X = torch.rand(30, 100)
+    x_0 = torch.zeros(1, 100)
+    x_1 = torch.ones(1, 100)
+    x_r = torch.rand(1, 100)
+
+    model = NMF(X.shape, 3, fix_components=[False, True, True])
+    assert isinstance(model, NMF)
+
+    model = NMF(
+        X.shape, 3, initial_components=[x_0, x_1], fix_components=[True, True, False]
+    )
+    model.fit(X)
+    H = model.H
+    assert torch.all(H[0, :] == 0)
+    assert torch.all(H[1, :] == 1)
+
+    model = NMF(
+        X.shape,
+        3,
+        initial_components=[x_0, torch.clone(x_r)],
+        fix_components=[False, True],
+    )
+    model.fit(X)
+    H = model.H
+    assert torch.all(torch.eq(H[1, :], x_r))
+
+    model = NMF(
+        X.shape,
+        3,
+        initial_components=[x_0, torch.clone(x_r)],
+        fix_components=[False, False],
+    )
+    model.fit(X)
+    H = model.H
+    assert not torch.all(torch.eq(H[1, :], x_r))
