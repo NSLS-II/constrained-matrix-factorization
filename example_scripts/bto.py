@@ -18,7 +18,7 @@ def get_data(data_dir=None):
     for path in paths:
         x = np.load(path)
         T.append(
-            float(str(path).split("_")[1][:3])
+            float(str(path.name).split("_")[1][:3])
         )  # hardcoded nonsense for T from label
         profiles.append(x / x.max())
     X = torch.tensor(np.concatenate(profiles, axis=1).T, dtype=torch.float)
