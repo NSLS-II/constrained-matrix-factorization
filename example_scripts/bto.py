@@ -11,16 +11,14 @@ np.random.seed(1234)
 
 def get_data(data_dir=None):
     if data_dir is None:
-        data_dir = Path("~/Datasets/HTPXRD/BaTiO/exp_patterns").expanduser()
-    if data_dir is None:
-        data_dir = Path(__file__).parents[1] / "example_data/NaCl_CrCl3_pdf_ramp"
+        data_dir = Path(__file__).parents[1] / "example_data/BaTiO3_xrd_ramp"
     paths = sorted(list(data_dir.glob("*.npy")))
     profiles = list()
     T = list()
     for path in paths:
         x = np.load(path)
         T.append(
-            float(str(path).split("_")[2][:3])
+            float(str(path.name).split("_")[1][:3])
         )  # hardcoded nonsense for T from label
         profiles.append(x / x.max())
     X = torch.tensor(np.concatenate(profiles, axis=1).T, dtype=torch.float)
