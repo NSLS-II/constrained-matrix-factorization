@@ -11,7 +11,7 @@ np.random.seed(1234)
 
 def get_data(data_dir=None):
     if data_dir is None:
-        data_dir = Path(__file__).parents[1] / "example_data/BaTiO3_xrd_ramp"
+        data_dir = Path(__file__).absolute().parents[1] / "example_data/BaTiO3_xrd_ramp"
     paths = sorted(list(data_dir.glob("*.npy")))
     profiles = list()
     T = list()

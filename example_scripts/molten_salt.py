@@ -11,7 +11,9 @@ np.random.seed(1234)
 
 def get_data(data_dir=None):
     if data_dir is None:
-        data_dir = Path(__file__).parents[1] / "example_data/NaCl_CrCl3_pdf_ramp"
+        data_dir = (
+            Path(__file__).absolute().parents[1] / "example_data/NaCl_CrCl3_pdf_ramp"
+        )
     paths = sorted(
         list(data_dir.glob("*.chi")),
         key=lambda path: float(str(path.name).split("_")[-2][1:-1]),
